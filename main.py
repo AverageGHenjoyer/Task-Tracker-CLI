@@ -1,5 +1,6 @@
 import sys
 import json
+from datetime import datetime
 
 ERROR = '''Usage:
 task-tracker-cli add "something"
@@ -34,12 +35,14 @@ def task_add(description, status="todo"):
     new_task = {
         "ID": generate_id(data),
         "description": description,
-        "status": status
+        "status": status,
+        "created_at": datetime.now().replace(microsecond=0),
+        "updated_at": datetime.now().replace(microsecond=0)
     }
 
     data.append(new_task)
     with open("data.json", "w") as f:
-        json.dump(data, f,indent=4)
+        json.dump(data, f,indent=4, default=str)
         print("Task added successfully.")
 
 
@@ -67,7 +70,7 @@ def task_list():
                 print("Wrong option for task status.")
     elif len(sys.argv) == 2:
         for task in data:
-            print(f"ID: {task['ID']}, task: {task['description']}, status: {task['status']}")
+            print(f"ID: {task['ID']}, task: {task['description']}, status: {task['status']}, created_at: {task['created_at']}, last_updated: {task['updated_at']}")
 
 def task_update(ID, new_description):
     global data
@@ -79,10 +82,11 @@ def task_update(ID, new_description):
     for task in data:
         if task['ID'] == ID:
             task['description'] = new_description
+            task['updated_at'] = datetime.now().replace(microsecond=0)
             success = True
     if success:
         with open("data.json", "w") as f:
-            json.dump(data, f, indent=4)
+            json.dump(data, f, indent=4, default=str)
     else:
         print(f"Task with ID {ID} not found.")
 
@@ -101,7 +105,7 @@ def task_delete(ID):
         print(f"Not found such task with ID {ID}.")
 
     with open("data.json", "w") as f:
-        json.dump(updated_data, f, indent=4)
+        json.dump(updated_data, f, indent=4, default=str)
 
 
 def task_mark_in_progress(ID):
@@ -117,7 +121,7 @@ def task_mark_in_progress(ID):
             success = True
     if success:
         with open("data.json", "w") as f:
-            json.dump(data, f, indent=4)
+            json.dump(data, f, indent=4, default=str)
     else:
         print(f"Task with ID {ID} not found.")
 
@@ -135,7 +139,7 @@ def task_mark_done(ID):
             success = True
     if success:
         with open("data.json", "w") as f:
-            json.dump(data, f, indent=4)
+            json.dump(data, f, indent=4, default=str)
     else:
         print(f"Task with ID {ID} not found.")
 
