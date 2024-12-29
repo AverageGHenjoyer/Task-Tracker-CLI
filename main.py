@@ -30,7 +30,7 @@ def generate_id(data):
     return max(item["ID"] for item in data) + 1
 
 
-def task_add(description, status="in-progress"):
+def task_add(description, status="todo"):
     new_task = {
         "ID": generate_id(data),
         "description": description,
@@ -47,9 +47,27 @@ def task_list():
     if not data:
         print("No tasks found.")
         return
+    if len(sys.argv) == 3:
+        match(sys.argv[2]):
+            case "done":
+                for task in data:
+                    if task['status'] == 'done':
+                        print(f"ID: {task['ID']}, task: {task['description']}, status: {task['status']}")
+            case "todo":
+                for task in data:
+                    if task['status'] == 'todo':
+                        print(f"ID: {task['ID']}, task: {task['description']}, status: {task['status']}")
 
-    for task in data:
-        print(f"ID: {task['ID']}, task: {task['description']}, status: {task['status']}")
+            case "in-progress":
+                for task in data:
+                    if task['status'] == 'in-progress':
+                        print(f"ID: {task['ID']}, task: {task['description']}, status: {task['status']}")
+
+            case _:
+                print("Wrong option for task status.")
+    elif len(sys.argv) == 2:
+        for task in data:
+            print(f"ID: {task['ID']}, task: {task['description']}, status: {task['status']}")
 
 def task_update(ID, new_description):
     global data
@@ -85,10 +103,6 @@ def task_delete(ID):
     with open("data.json", "w") as f:
         json.dump(updated_data, f, indent=4)
 
-def get_object(ID):
-    for task in data:
-        if task['ID'] == ID:
-            return task
 
 def task_mark_in_progress(ID):
     global data
